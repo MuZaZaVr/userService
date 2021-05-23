@@ -1,0 +1,10 @@
+pg:
+  databaseName: postgres
+  databaseSslMode: disabled
+  databaseDialect: postgresDialect
+
+http:
+  port: 8000
+  maxHeaderBytes: 1
+  readTimeout: 10s
+  writeTimeout: 10s
