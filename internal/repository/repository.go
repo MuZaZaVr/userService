@@ -20,7 +20,7 @@ func NewRepositories(db *sql.DB) *Repositories {
 type User interface {
 	Create(user model.User) (int, error)
 	FindByLogin(login string) (*model.User, error)
-	FindByCredentials(login, password string) (*model.User, error)
+	FindByCredentials(user model.User) (*model.User, error)
 }
 
 type UserRole interface {

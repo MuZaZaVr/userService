@@ -31,7 +31,7 @@ func (u UserRepo) Create(user model.User) (int, error) {
 		}
 	}
 
-	return id, nil
+	return id, rows.Err()
 }
 
 func (u UserRepo) FindByLogin(login string) (*model.User, error) {
@@ -52,20 +52,20 @@ func (u UserRepo) FindByLogin(login string) (*model.User, error) {
 	return &user, rows.Err()
 }
 
-func (u UserRepo) FindByCredentials(login, password string) (*model.User, error) {
-	var user model.User
+func (u UserRepo) FindByCredentials(user model.User) (*model.User, error) {
+	var newUser model.User
 
-	rows, err := u.db.Query("SELECT * FROM users WHERE login = $1 AND password = $2", login, password)
+	rows, err := u.db.Query("SELECT * FROM users WHERE login = $1 AND password = $2", user.Login, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	if rows.Next() {
-		err := rows.Scan(&user.ID, &user.Login, &user.Password, &user.RoleID)
+		err := rows.Scan(&newUser.ID, &newUser.Login, &newUser.Password, &newUser.RoleID)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return &user, err
+	return &newUser, rows.Err()
 }

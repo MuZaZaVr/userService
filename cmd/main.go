@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/MuZaZaVr/notesService/internal/config"
 	"github.com/MuZaZaVr/notesService/internal/repository"
+	"github.com/MuZaZaVr/notesService/internal/service"
 	"github.com/MuZaZaVr/notesService/pkg/database/pg"
 	"log"
 )
@@ -23,7 +24,11 @@ func main() {
 		log.Fatalf("Error init db: %s", err)
 	}
 
-	/* Repository layer */
-	_ = repository.NewRepositories(db)
+	/* Repositories layer */
+	repos := repository.NewRepositories(db)
 
+	/* Services layer */
+	_ = service.NewServices(service.Depends{
+		Repos: repos,
+	})
 }
