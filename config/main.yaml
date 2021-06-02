@@ -1,7 +1,7 @@
 pg:
-  databaseName: postgres
-  databaseSslMode: disabled
-  databaseDialect: postgresDialect
+  databaseName: userService
+  databaseSslMode: disable
+  databaseDialect: postgres
 
 http:
   port: 8000
