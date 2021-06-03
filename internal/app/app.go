@@ -7,6 +7,7 @@ import (
 	"github.com/MuZaZaVr/notesService/internal/repository"
 	"github.com/MuZaZaVr/notesService/internal/server"
 	"github.com/MuZaZaVr/notesService/internal/service"
+	"github.com/MuZaZaVr/notesService/pkg/auth"
 	"github.com/MuZaZaVr/notesService/pkg/database/pg"
 	"log"
 	"os"
@@ -35,9 +36,16 @@ func Run(configPath string) {
 	/* Repositories layer */
 	repos := repository.NewRepositories(db)
 
+	/* Token manager */
+	tokenManager, err := auth.NewManager(cfg.JWT.SigningKey)
+	if err != nil {
+		log.Fatalf("Init JWT-token error: %v", err)
+	}
+
 	/* Services layer */
 	services := service.NewServices(service.Depends{
 		Repos: repos,
+		TokenManager: tokenManager,
 	})
 
 	newHandler := handler.NewHandler(services)

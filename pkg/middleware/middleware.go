@@ -30,3 +30,9 @@ func JSONReturn(w http.ResponseWriter, statusCode int, jsonObject interface{}) {
 func JSONError(w http.ResponseWriter, statusCode int, err error) {
 	JSONReturn(w, statusCode, err)
 }
+
+
+func Empty(w http.ResponseWriter, statusCode int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(statusCode)
+}

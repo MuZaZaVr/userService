@@ -57,7 +57,6 @@ func (req *loginRequest) Validate() error {
 	return nil
 }
 
-
 func (u *userRouter) loginUser(w http.ResponseWriter, r *http.Request) {
 	var req loginRequest
 
@@ -66,7 +65,16 @@ func (u *userRouter) loginUser(w http.ResponseWriter, r *http.Request) {
 		middleware.JSONError(w, http.StatusBadRequest, err)
 	}
 
-	fmt.Printf("Login | Request: %v \n", req)
+	token, err := u.services.User.FindByCredentials(req.LoginUserRequest)
+	if err != nil {
+		middleware.JSONError(w, http.StatusInternalServerError, err)
+	}
+
+	if len(token) == 0 {
+		middleware.Empty(w, http.StatusNotFound)
+	}
+
+	middleware.JSONReturn(w, http.StatusOK, token)
 }
 
 /* Register user */
@@ -97,7 +105,6 @@ func (req *registerRequest) Validate() error {
 	return nil
 }
 
-
 func (u *userRouter) registerUser(w http.ResponseWriter, r *http.Request) {
 	var req registerRequest
 
@@ -119,7 +126,7 @@ func (u *userRouter) registerUser(w http.ResponseWriter, r *http.Request) {
 
 	id, err := u.services.User.Create(req.RegisterUserRequest)
 	if err != nil {
-		 middleware.JSONError(w, http.StatusInternalServerError, err)
+		middleware.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
 

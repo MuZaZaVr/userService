@@ -13,6 +13,8 @@ type
 	Config struct {
 		Pg   PgConfig
 		HTTP HTTPConfig
+
+		JWT JWTConfig
 	}
 
 	PgConfig struct {
@@ -31,6 +33,10 @@ type
 		MaxHeaderBytes int
 		ReadTimeout    time.Duration
 		WriteTimeout   time.Duration
+	}
+
+	JWTConfig struct {
+		SigningKey string
 	}
 )
 
@@ -67,10 +73,9 @@ func parseFiles(cfg *Config) error {
 	return nil
 }
 
-
 func loadConfigFiles(path string) {
 	configPath := "/home/pogremulllka/go/src/github.com/MuZaZaVr/notesService/config/"
-	configName := strings.Split(path, "/")[1]	//setConfigName -> main
+	configName := strings.Split(path, "/")[1] //setConfigName -> main
 
 	viper.AddConfigPath(configPath)
 	viper.SetConfigName(configName)
@@ -147,6 +152,36 @@ func parseConfigFiles(cfg *Config) error {
 }
 
 func parseEnvFile(cfg *Config) error {
+	err := parseValues()
+	if err != nil {
+		return err
+	}
+
+	setValues(cfg)
+
+	return nil
+}
+
+func parseValues() error {
+	err := parsePgValues()
+	if err != nil {
+		return err
+	}
+
+	err = parseJWTValues()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func setValues(cfg *Config) {
+	setPgValues(cfg)
+	setJWTValues(cfg)
+}
+
+func parsePgValues() error {
 	viper.SetEnvPrefix("pg")
 
 	if err := viper.BindEnv("user"); err != nil {
@@ -165,14 +200,26 @@ func parseEnvFile(cfg *Config) error {
 		return err
 	}
 
-	setEnvValues(cfg)
+	return nil
+}
+
+func parseJWTValues() error {
+	viper.SetEnvPrefix("jwt")
+
+	if err := viper.BindEnv("signing_key"); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func setEnvValues(cfg *Config) {
+func setPgValues(cfg *Config) {
 	cfg.Pg.User = viper.GetString("user")
 	cfg.Pg.Password = viper.GetString("password")
 	cfg.Pg.Host = viper.GetString("host")
 	cfg.Pg.Port = viper.GetInt("port")
+}
+
+func setJWTValues(cfg *Config) {
+	cfg.JWT.SigningKey = viper.GetString("signing_key")
 }
