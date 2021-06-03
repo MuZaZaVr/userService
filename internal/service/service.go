@@ -25,6 +25,8 @@ type User interface {
 	Create(req model.RegisterUserRequest) (int, error)
 	FindByLogin(login string) (*model.User, error)
 	FindByCredentials(req model.LoginUserRequest) (*model.User, error)
+
+	IsExist(login string) (bool, error)
 }
 
 type UserRole interface {

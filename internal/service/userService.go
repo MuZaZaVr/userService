@@ -49,3 +49,11 @@ func (u UserService) FindByCredentials(req model.LoginUserRequest) (*model.User,
 	return newUser, nil
 }
 
+func (u UserService) IsExist(login string) (bool, error) {
+	exist, err := u.User.IsExist(login)
+	if err != nil {
+		return false, errors.Wrap(err, "can not check user existence")
+	}
+
+	return exist, nil
+}

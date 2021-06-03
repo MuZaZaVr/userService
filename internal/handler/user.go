@@ -8,6 +8,7 @@ import (
 	"github.com/MuZaZaVr/notesService/pkg/middleware"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 type userRouter struct {
@@ -103,9 +104,24 @@ func (u *userRouter) registerUser(w http.ResponseWriter, r *http.Request) {
 	err := middleware.ParseRequest(r, &req)
 	if err != nil {
 		middleware.JSONError(w, http.StatusBadRequest, err)
+		return
 	}
 
+	exist, err := u.services.User.IsExist(req.Login)
+	if err != nil {
+		middleware.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if exist {
+		middleware.JSONReturn(w, http.StatusFound, "This user already exists")
+		return
+	}
 
+	id, err := u.services.User.Create(req.RegisterUserRequest)
+	if err != nil {
+		 middleware.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
 
-	fmt.Printf("Register | Request: %v \n", req)
+	middleware.JSONReturn(w, http.StatusOK, strconv.Itoa(id))
 }
