@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/MuZaZaVr/notesService/internal/model"
 	"github.com/MuZaZaVr/notesService/internal/service"
+	"github.com/MuZaZaVr/notesService/pkg/auth"
 	"github.com/MuZaZaVr/notesService/pkg/middleware"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -14,18 +15,24 @@ import (
 type userRouter struct {
 	*mux.Router
 	services *service.Service
+	tokenManager auth.TokenManager
 }
 
-func newUserRouter(services *service.Service) userRouter {
+func newUserRouter(services *service.Service, tokenManager auth.TokenManager) userRouter {
 	router := mux.NewRouter().PathPrefix(userPath).Subrouter()
 	handler := userRouter{
 		Router:   router,
 		services: services,
+		tokenManager: tokenManager,
 	}
 
 	router.Path("/login").Methods(http.MethodPost).HandlerFunc(handler.loginUser)
 	router.Path("/registration").Methods(http.MethodPost).HandlerFunc(handler.registerUser)
 
+	secureRouter := router.PathPrefix("/api").Subrouter()
+	secureRouter.Use(handler.tokenManager.UserIdentity)
+
+	secureRouter.Path("/getAll").Methods(http.MethodGet).HandlerFunc(handler.getAllUsers)
 	return handler
 }
 
@@ -131,4 +138,12 @@ func (u *userRouter) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	middleware.JSONReturn(w, http.StatusOK, strconv.Itoa(id))
+}
+
+func (u *userRouter) getAllUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := u.services.Role.FindAllUsers()
+	if err != nil {
+		middleware.JSONError(w, http.StatusInternalServerError, err)
+	}
+	middleware.JSONReturn(w, http.StatusOK, users)
 }

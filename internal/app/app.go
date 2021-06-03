@@ -48,7 +48,7 @@ func Run(configPath string) {
 		TokenManager: tokenManager,
 	})
 
-	newHandler := handler.NewHandler(services)
+	newHandler := handler.NewHandler(services, tokenManager)
 
 	newServer := server.NewServer(cfg, newHandler)
 
