@@ -1,0 +1,16 @@
+
+CREATE TABLE IF NOT EXISTS user_role (
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1),
+    role text NOT NULL
+);
+
+insert into user_role (role) VALUES ('ADMIN'), ('USER');
+
+CREATE TABLE IF NOT EXISTS users (
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1),
+    login text NOT NULL,
+    password text NOT NULL,
+    roleID integer NOT NULL REFERENCES user_role(id)
+);
+
+INSERT INTO users (login, password, roleID) VALUES ('ADMIN', 'ADMIN', 1)

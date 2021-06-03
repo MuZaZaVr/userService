@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/MuZaZaVr/notesService/internal/model"
 	"github.com/MuZaZaVr/notesService/internal/model/dto"
+	"strings"
 )
 
 type UserRepo struct {
@@ -68,4 +69,15 @@ func (u UserRepo) FindByCredentials(user model.User) (*model.User, error) {
 	}
 
 	return &newUser, rows.Err()
+}
+
+func (u UserRepo) IsExist(login string) (bool, error) {
+	userFromDB, err := u.FindByLogin(login)
+	if err != nil && strings.Contains(err.Error(), "sql: Rows are closed") {
+		return false, err
+	} else if userFromDB != nil && userFromDB.ID != 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
