@@ -4,6 +4,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -54,9 +55,20 @@ func Init(configPath string) (*Config, error) {
 	return &config, nil
 }
 
-func loadFilesIntoViper(path string) error {
-	loadConfigFiles(path)
-	loadEnvFile()
+func loadFilesIntoViper(configPath string) error {
+	currentDirectoryPath, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	pathSplit := strings.SplitAfter(currentDirectoryPath, "account-service")[0]
+	envFilePath := pathSplit + "/" + ".env"
+	configPathSplit := strings.Split(configPath, "/")
+	configFilePath := pathSplit + "/" + configPathSplit[0]
+	configFileName := configPathSplit[1]
+
+	loadConfigFiles(configFilePath, configFileName)
+	loadEnvFile(envFilePath)
 
 	return viper.ReadInConfig()
 }
@@ -73,16 +85,13 @@ func parseFiles(cfg *Config) error {
 	return nil
 }
 
-func loadConfigFiles(path string) {
-	configPath := "/home/pogremulllka/go/src/github.com/MuZaZaVr/notesService/config/"
-	configName := strings.Split(path, "/")[1] //setConfigName -> main
-
-	viper.AddConfigPath(configPath)
-	viper.SetConfigName(configName)
+func loadConfigFiles(configFilePath, configFileName string) {
+	viper.AddConfigPath(configFilePath)
+	viper.SetConfigName(configFileName)
 }
 
-func loadEnvFile() {
-	if err := godotenv.Load(); err != nil {
+func loadEnvFile(envFilePath string) {
+	if err := godotenv.Load(envFilePath); err != nil {
 		log.Fatalf("Error load .env file: %s", err)
 	}
 }

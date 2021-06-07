@@ -32,6 +32,7 @@ func NewManager(signingKey string) (*Manager, error) {
 func (m *Manager) NewJWT(userId string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   userId,
+
 	})
 
 	return token.SignedString([]byte(m.signingKey))
