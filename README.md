@@ -1,2 +1,2 @@
- Я Вася, все коммиты пушил в dev ветку, при этом не чекнул, что не была создана master. 
- Will fix later 🤷‍
+## Build & run in docker containers:
+> docker-compose up --build user-service
